@@ -207,6 +207,11 @@
             animation: pulse 2s infinite;
         }
         
+        .realtime-indicator.off {
+            background: rgba(113, 128, 150, 0.2);
+            animation: none;
+        }
+        
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(56, 161, 105, 0); }
@@ -400,6 +405,11 @@
         .refresh-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(44, 82, 130, 0.4);
+        }
+        
+        .refresh-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         
         .live-update-toggle {
@@ -821,8 +831,20 @@
         
         .card-photos-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .card-photos-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .card-photos-container {
+                grid-template-columns: 1fr;
+            }
         }
         
         .card-photo-box {
@@ -1647,7 +1669,7 @@
                     <div class="dashboard-title">
                         <i class="fas fa-tachometer-alt"></i> لوحة تحكم المشرفين
                     </div>
-                    <div class="realtime-indicator">
+                    <div class="realtime-indicator" id="realtimeIndicator">
                         <i class="fas fa-broadcast-tower"></i>
                         <span>التحديث المباشر مفعل</span>
                     </div>
@@ -1805,18 +1827,27 @@
                     </div>
                     
                     <div class="card-photos-container">
-                        <div class="card-photo-box" onclick="showFullImage('cardFront')">
-                            <div class="card-photo-label">الوجه الأمامي</div>
-                            <img class="card-photo-preview" id="viewCardFront" alt="الوجه الأمامي">
-                            <div class="card-photo-placeholder" id="cardFrontPlaceholder">
+                        <div class="card-photo-box" onclick="showFullImage('idFront')">
+                            <div class="card-photo-label">الوجه الأمامي للهوية</div>
+                            <img class="card-photo-preview" id="viewIdFront" alt="الوجه الأمامي للهوية">
+                            <div class="card-photo-placeholder" id="idFrontPlaceholder">
                                 لا توجد صورة<br>
                                 <small>انقر لعرض الصورة</small>
                             </div>
                         </div>
-                        <div class="card-photo-box" onclick="showFullImage('cardBack')">
-                            <div class="card-photo-label">الوجه الخلفي</div>
-                            <img class="card-photo-preview" id="viewCardBack" alt="الوجه الخلفي">
-                            <div class="card-photo-placeholder" id="cardBackPlaceholder">
+                        <div class="card-photo-box" onclick="showFullImage('idBack')">
+                            <div class="card-photo-label">الوجه الخلفي للهوية</div>
+                            <img class="card-photo-preview" id="viewIdBack" alt="الوجه الخلفي للهوية">
+                            <div class="card-photo-placeholder" id="idBackPlaceholder">
+                                لا توجد صورة<br>
+                                <small>انقر لعرض الصورة</small>
+                            </div>
+                        </div>
+                        <!-- ✅ إضافة صندوق لعرض صورة الهوية القديمة -->
+                        <div class="card-photo-box" onclick="showFullImage('oldId')">
+                            <div class="card-photo-label">الهوية القديمة</div>
+                            <img class="card-photo-preview" id="viewOldId" alt="الهوية القديمة">
+                            <div class="card-photo-placeholder" id="oldIdPlaceholder">
                                 لا توجد صورة<br>
                                 <small>انقر لعرض الصورة</small>
                             </div>
@@ -2053,12 +2084,15 @@
                 
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 
+                // اختبار الاتصال
                 const { data, error } = await supabaseClient
                     .from('membership_applications')
-                    .select('count', { count: 'exact', head: true });
+                    .select('id')
+                    .limit(1);
                 
                 if (error) {
-                    console.warn('⚠️ ملاحظة:', error.message);
+                    console.error('❌ خطأ في الاتصال بقاعدة البيانات:', error.message);
+                    showNotification('تعذر الاتصال بقاعدة البيانات. يرجى التحقق من الاتصال بالإنترنت.', 'error');
                     return false;
                 } else {
                     console.log('✅ لوحة التحكم جاهزة للاستخدام!');
@@ -2067,6 +2101,7 @@
                 
             } catch (error) {
                 console.error('❌ خطأ في التهيئة:', error);
+                showNotification('تعذر الاتصال بقاعدة البيانات. يرجى التحقق من الاتصال بالإنترنت.', 'error');
                 return false;
             }
         }
@@ -2079,6 +2114,8 @@
                 isProcessing = true;
                 if (!highlightNew) showLoading();
                 
+                console.log('📥 جاري تحميل البيانات من قاعدة البيانات...');
+                
                 const { data, error } = await supabaseClient
                     .from('membership_applications')
                     .select('*')
@@ -2087,8 +2124,11 @@
                 if (error) {
                     console.error('❌ خطأ في تحميل البيانات:', error);
                     showNoDataMessage();
+                    showNotification('حدث خطأ في تحميل البيانات', 'error');
                     return;
                 }
+                
+                console.log(`✅ تم تحميل ${data?.length || 0} طلب`);
                 
                 const oldDataCount = applicationsData.length;
                 applicationsData = data || [];
@@ -2120,6 +2160,7 @@
             } catch (error) {
                 console.error('❌ خطأ في تحميل البيانات:', error);
                 showNoDataMessage();
+                showNotification('حدث خطأ في تحميل البيانات', 'error');
             } finally {
                 if (!highlightNew) hideLoading();
                 isProcessing = false;
@@ -2143,25 +2184,37 @@
                             table: 'membership_applications'
                         },
                         async (payload) => {
-                            console.log('📡 تحديث مباشر:', payload);
-                            
-                            // تحديث الإحصائيات
-                            updateStats();
-                            
-                            // إعادة تحميل البيانات مع تسليط الضوء على الجديد
-                            await loadApplications(true);
+                            console.log('📡 تحديث مباشر:', payload.eventType, payload.new);
                             
                             // عرض إشعار بالتحديث
                             const eventType = getEventTypeArabic(payload.eventType);
-                            showNotification(`${eventType} طلب`, 'info');
+                            
+                            if (payload.eventType === 'INSERT') {
+                                showNotification(`${eventType} طلب جديد`, 'success');
+                            } else {
+                                showNotification(`${eventType} طلب`, 'info');
+                            }
+                            
+                            // إعادة تحميل البيانات بعد تأخير بسيط
+                            setTimeout(() => {
+                                loadApplications(true);
+                            }, 500);
                         }
                     )
-                    .subscribe();
-                
-                console.log('✅ التحديث المباشر مفعل!');
+                    .subscribe((status) => {
+                        if (status === 'SUBSCRIBED') {
+                            console.log('✅ التحديث المباشر مفعل!');
+                            document.getElementById('realtimeIndicator').classList.remove('off');
+                        } else if (status === 'CHANNEL_ERROR') {
+                            console.error('❌ خطأ في قناة التحديث المباشر');
+                            document.getElementById('realtimeIndicator').classList.add('off');
+                        }
+                    });
                 
             } catch (error) {
                 console.error('❌ خطأ في تفعيل التحديث المباشر:', error);
+                document.getElementById('realtimeIndicator').classList.add('off');
+                showNotification('تعذر تفعيل التحديث المباشر', 'error');
             }
         }
         
@@ -2177,15 +2230,18 @@
         function toggleLiveUpdate() {
             liveUpdateEnabled = !liveUpdateEnabled;
             const toggleBtn = document.getElementById('liveUpdateToggle');
+            const indicator = document.getElementById('realtimeIndicator');
             
             if (liveUpdateEnabled) {
                 toggleBtn.innerHTML = '<i class="fas fa-broadcast-tower"></i> تحديث مباشر: مفعل';
                 toggleBtn.classList.remove('disabled');
+                indicator.classList.remove('off');
                 setupRealtimeUpdates();
                 showNotification('تم تفعيل التحديث المباشر', 'success');
             } else {
                 toggleBtn.innerHTML = '<i class="fas fa-broadcast-tower"></i> تحديث مباشر: معطل';
                 toggleBtn.classList.add('disabled');
+                indicator.classList.add('off');
                 
                 if (realtimeSubscription) {
                     supabaseClient.removeChannel(realtimeSubscription);
@@ -2233,12 +2289,6 @@
         
         function updateLastUpdateTime() {
             const now = new Date();
-            const dateString = now.toLocaleDateString('ar-EG', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
             const timeString = now.toLocaleTimeString('ar-EG', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -2452,19 +2502,26 @@
             setupPagination(filtered);
         }
         
-        // ========== عرض تفاصيل الطلب مع الصور ==========
+        // ========== عرض تفاصيل الطلب مع الصور - FIXED ==========
         async function viewApplication(id) {
             if (isProcessing) return;
             
             try {
                 isProcessing = true;
+                
+                // استخدام select للحصول على جميع الحقول
                 const { data, error } = await supabaseClient
                     .from('membership_applications')
                     .select('*')
                     .eq('id', id)
                     .single();
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ خطأ في عرض الطلب:', error);
+                    throw error;
+                }
+                
+                console.log('📋 بيانات الطلب:', data);
                 
                 currentApplicationId = id;
                 currentApplicationData = data;
@@ -2484,6 +2541,8 @@
         }
         
         function prepareView(data) {
+            console.log('🖼️ تحضير عرض البيانات:', data);
+            
             // تعبئة حقول العرض
             document.getElementById('viewReceiptId').textContent = data.receipt_id || 'غير متوفر';
             document.getElementById('viewFullName').textContent = data.full_name || 'غير متوفر';
@@ -2512,7 +2571,7 @@
                 minute: '2-digit'
             });
             
-            // عرض الصور
+            // عرض الصور - مع دعم صورة الهوية القديمة
             displayPhotos(data);
             
             // تعبئة حقول التعديل
@@ -2530,6 +2589,11 @@
             // تحديث متغير النقابة المختارة
             selectedUnion = unionValue || '';
             
+            // إزالة أي مستمعين سابقين لمنع التكرار
+            const unionSelect = document.getElementById('viewUnionSelect');
+            const newUnionSelect = unionSelect.cloneNode(true);
+            unionSelect.parentNode.replaceChild(newUnionSelect, unionSelect);
+            
             // إضافة حدث عند تغيير اختيار النقابة
             document.getElementById('viewUnionSelect').addEventListener('change', function() {
                 selectedUnion = this.value;
@@ -2543,38 +2607,131 @@
         }
         
         function displayPhotos(data) {
-            // الصورة الشخصية
+            console.log('🖼️ عرض الصور:', {
+                has_personal_photo: data.has_personal_photo,
+                personal_photo_base64: data.personal_photo_base64 ? 'موجود' : 'غير موجود',
+                id_front_base64: data.id_front_base64 ? 'موجود' : 'غير موجود',
+                id_back_base64: data.id_back_base64 ? 'موجود' : 'غير موجود',
+                card_front_base64: data.card_front_base64 ? 'موجود' : 'غير موجود',
+                card_back_base64: data.card_back_base64 ? 'موجود' : 'غير موجود',
+                old_id_base64: data.old_id_base64 ? 'موجود' : 'غير موجود' // ✅ حقل الهوية القديمة
+            });
+            
+            // الصورة الشخصية - دعم حقول متعددة
+            let personalPhotoSrc = null;
+            
+            // البحث عن الصورة الشخصية في حقول مختلفة
             if (data.has_personal_photo && data.personal_photo_base64) {
-                document.getElementById('viewPersonalPhoto').src = data.personal_photo_base64;
+                personalPhotoSrc = data.personal_photo_base64;
+            } else if (data.personal_photo_url) {
+                personalPhotoSrc = data.personal_photo_url;
+            } else if (data.photo_url) {
+                personalPhotoSrc = data.photo_url;
+            }
+            
+            if (personalPhotoSrc) {
+                document.getElementById('viewPersonalPhoto').src = personalPhotoSrc;
                 document.getElementById('viewPersonalPhoto').style.display = 'block';
                 document.getElementById('viewPhotoPlaceholder').style.display = 'none';
+                console.log('✅ تم تحميل الصورة الشخصية');
             } else {
                 document.getElementById('viewPersonalPhoto').style.display = 'none';
                 document.getElementById('viewPhotoPlaceholder').style.display = 'flex';
+                console.log('❌ لا توجد صورة شخصية');
             }
             
-            // صورة الوجه الأمامي للبطاقة
-            if (data.has_card_front && data.card_front_base64) {
-                document.getElementById('viewCardFront').src = data.card_front_base64;
-                document.getElementById('viewCardFront').style.display = 'block';
-                document.getElementById('cardFrontPlaceholder').style.display = 'none';
-            } else {
-                document.getElementById('viewCardFront').style.display = 'none';
-                document.getElementById('cardFrontPlaceholder').style.display = 'block';
+            // صورة الوجه الأمامي للهوية - البحث في حقول مختلفة
+            let idFrontSrc = null;
+            
+            // أولوية: id_front_base64 (الكود القديم)
+            if (data.id_front_base64) {
+                idFrontSrc = data.id_front_base64;
+                console.log('✅ وجدت id_front_base64');
+            } 
+            // ثانوية: card_front_base64 (الكود الجديد)
+            else if (data.has_card_front && data.card_front_base64) {
+                idFrontSrc = data.card_front_base64;
+                console.log('✅ وجدت card_front_base64');
+            }
+            // ثالثة: card_front_url (URL)
+            else if (data.card_front_url) {
+                idFrontSrc = data.card_front_url;
+                console.log('✅ وجدت card_front_url');
             }
             
-            // صورة الوجه الخلفي للبطاقة
-            if (data.has_card_back && data.card_back_base64) {
-                document.getElementById('viewCardBack').src = data.card_back_base64;
-                document.getElementById('viewCardBack').style.display = 'block';
-                document.getElementById('cardBackPlaceholder').style.display = 'none';
+            if (idFrontSrc) {
+                document.getElementById('viewIdFront').src = idFrontSrc;
+                document.getElementById('viewIdFront').style.display = 'block';
+                document.getElementById('idFrontPlaceholder').style.display = 'none';
+                console.log('✅ تم تحميل الوجه الأمامي للهوية');
             } else {
-                document.getElementById('viewCardBack').style.display = 'none';
-                document.getElementById('cardBackPlaceholder').style.display = 'block';
+                document.getElementById('viewIdFront').style.display = 'none';
+                document.getElementById('idFrontPlaceholder').style.display = 'block';
+                console.log('❌ لا توجد صورة للوجه الأمامي للهوية');
+            }
+            
+            // صورة الوجه الخلفي للهوية - البحث في حقول مختلفة
+            let idBackSrc = null;
+            
+            // أولوية: id_back_base64 (الكود القديم)
+            if (data.id_back_base64) {
+                idBackSrc = data.id_back_base64;
+                console.log('✅ وجدت id_back_base64');
+            } 
+            // ثانوية: card_back_base64 (الكود الجديد)
+            else if (data.has_card_back && data.card_back_base64) {
+                idBackSrc = data.card_back_base64;
+                console.log('✅ وجدت card_back_base64');
+            }
+            // ثالثة: card_back_url (URL)
+            else if (data.card_back_url) {
+                idBackSrc = data.card_back_url;
+                console.log('✅ وجدت card_back_url');
+            }
+            
+            if (idBackSrc) {
+                document.getElementById('viewIdBack').src = idBackSrc;
+                document.getElementById('viewIdBack').style.display = 'block';
+                document.getElementById('idBackPlaceholder').style.display = 'none';
+                console.log('✅ تم تحميل الوجه الخلفي للهوية');
+            } else {
+                document.getElementById('viewIdBack').style.display = 'none';
+                document.getElementById('idBackPlaceholder').style.display = 'block';
+                console.log('❌ لا توجد صورة للوجه الخلفي للهوية');
+            }
+            
+            // ✅ صورة الهوية القديمة - البحث في حقول مختلفة
+            let oldIdSrc = null;
+            
+            // أولوية: old_id_base64 (الكود القديم)
+            if (data.old_id_base64) {
+                oldIdSrc = data.old_id_base64;
+                console.log('✅ وجدت old_id_base64');
+            }
+            // ثانوية: old_id_url (URL)
+            else if (data.old_id_url) {
+                oldIdSrc = data.old_id_url;
+                console.log('✅ وجدت old_id_url');
+            }
+            // ثالثة: old_card_base64 (أسماء بديلة)
+            else if (data.old_card_base64) {
+                oldIdSrc = data.old_card_base64;
+                console.log('✅ وجدت old_card_base64');
+            }
+            
+            if (oldIdSrc) {
+                document.getElementById('viewOldId').src = oldIdSrc;
+                document.getElementById('viewOldId').style.display = 'block';
+                document.getElementById('oldIdPlaceholder').style.display = 'none';
+                console.log('✅ تم تحميل صورة الهوية القديمة');
+            } else {
+                document.getElementById('viewOldId').style.display = 'none';
+                document.getElementById('oldIdPlaceholder').style.display = 'block';
+                console.log('❌ لا توجد صورة للهوية القديمة');
             }
         }
         
-        // ========== عرض الصورة بشكل كامل ==========
+        // ========== عرض الصورة بشكل كامل مع دعم الهوية القديمة ==========
         function showFullImage(imageType) {
             let imageSrc = '';
             let imageTitle = '';
@@ -2587,18 +2744,25 @@
                     imageTitle = 'الصورة الشخصية';
                     break;
                     
-                case 'cardFront':
-                    const cardFront = document.getElementById('viewCardFront');
-                    if (cardFront.style.display === 'none') return;
-                    imageSrc = cardFront.src;
-                    imageTitle = 'الوجه الأمامي للبطاقة الموحدة';
+                case 'idFront':
+                    const idFront = document.getElementById('viewIdFront');
+                    if (idFront.style.display === 'none') return;
+                    imageSrc = idFront.src;
+                    imageTitle = 'الوجه الأمامي للهوية';
                     break;
                     
-                case 'cardBack':
-                    const cardBack = document.getElementById('viewCardBack');
-                    if (cardBack.style.display === 'none') return;
-                    imageSrc = cardBack.src;
-                    imageTitle = 'الوجه الخلفي للبطاقة الموحدة';
+                case 'idBack':
+                    const idBack = document.getElementById('viewIdBack');
+                    if (idBack.style.display === 'none') return;
+                    imageSrc = idBack.src;
+                    imageTitle = 'الوجه الخلفي للهوية';
+                    break;
+                    
+                case 'oldId':
+                    const oldId = document.getElementById('viewOldId');
+                    if (oldId.style.display === 'none') return;
+                    imageSrc = oldId.src;
+                    imageTitle = 'الهوية القديمة';
                     break;
                     
                 default:
@@ -2702,7 +2866,7 @@
             }
         }
         
-        // ========== ✅ دالة طباعة الوصل الرسمي من الكود الأول ==========
+        // ========== ✅ دالة طباعة الوصل الرسمي ==========
         function printOfficialReceipt() {
             if (!currentApplicationData) return;
             
@@ -2733,8 +2897,17 @@
             document.getElementById('officialDocumentDate').textContent = todayFormatted;
             
             // عرض الصورة الشخصية
+            let personalPhotoSrc = null;
             if (data.has_personal_photo && data.personal_photo_base64) {
-                document.getElementById('officialPhotoPreview').src = data.personal_photo_base64;
+                personalPhotoSrc = data.personal_photo_base64;
+            } else if (data.personal_photo_url) {
+                personalPhotoSrc = data.personal_photo_url;
+            } else if (data.photo_url) {
+                personalPhotoSrc = data.photo_url;
+            }
+            
+            if (personalPhotoSrc) {
+                document.getElementById('officialPhotoPreview').src = personalPhotoSrc;
                 document.getElementById('officialPhotoPreview').style.display = 'block';
                 document.getElementById('officialPhotoPlaceholder').style.display = 'none';
             } else {
@@ -2888,7 +3061,7 @@
                 }
                 
                 setTimeout(() => {
-                    alert(`تم تنزيل ${fileName} بنجاح!\nتم حفظ الملف في مجلد التنزيلات.\nالجودة: عالية - الوضوح: ممتاز`);
+                    showNotification(`تم تنزيل ${fileName} بنجاح!`, 'success');
                 }, 500);
                 
             }).catch(error => {
@@ -2920,7 +3093,7 @@
                             document.getElementById('modalOverlay').style.display = 'none';
                         }, 300);
                         
-                        alert(`تم تنزيل ${fileName} بنجاح!\n(بجودة منخفضة بسبب مشكلة تقنية)`);
+                        showNotification(`تم تنزيل ${fileName} بنجاح! (بجودة منخفضة)`, 'info');
                     });
                 } catch (secondError) {
                     // إعادة تعيين زر الطباعة
@@ -2936,7 +3109,7 @@
                         document.getElementById('modalOverlay').style.display = 'none';
                     }, 300);
                     
-                    alert('حدث خطأ أثناء إنشاء الوصل. يرجى المحاولة مرة أخرى.');
+                    showNotification('حدث خطأ أثناء إنشاء الوصل. يرجى المحاولة مرة أخرى.', 'error');
                 }
             });
         }
@@ -3115,54 +3288,70 @@
         
         // ========== تهيئة الصفحة ==========
         async function initializePage() {
-            const initialized = await initializeSupabase();
+            console.log('🚀 بدء تهيئة لوحة التحكم...');
             
-            if (initialized) {
-                await loadApplications();
+            try {
+                const initialized = await initializeSupabase();
                 
-                // تفعيل التحديث المباشر
-                setupRealtimeUpdates();
-                
-                // إعداد أزرار التصفية والبحث
-                document.getElementById('searchInput').addEventListener('input', filterApplications);
-                document.getElementById('typeFilter').addEventListener('change', filterApplications);
-                document.getElementById('statusFilter').addEventListener('change', filterApplications);
-                document.getElementById('refreshBtn').addEventListener('click', () => loadApplications());
-                document.getElementById('liveUpdateToggle').addEventListener('click', toggleLiveUpdate);
-                
-                // إعداد أزرار المودال
-                document.getElementById('closeViewModal').addEventListener('click', () => closeModal('viewModal'));
-                document.getElementById('closeViewBtn').addEventListener('click', () => closeModal('viewModal'));
-                document.getElementById('saveChangesBtn').addEventListener('click', saveChanges);
-                document.getElementById('closeImageViewer').addEventListener('click', closeImageViewer);
-                
-                // إغلاق المودال عند النقر على الخلفية
-                document.getElementById('modalOverlay').addEventListener('click', function() {
-                    closeModal('viewModal');
-                    closeImageViewer();
-                    document.getElementById('officialReceipt').classList.remove('visible');
-                    this.style.opacity = '0';
-                    setTimeout(() => {
-                        this.style.display = 'none';
-                    }, 300);
-                });
-                
-                // إغلاق المودال عند الضغط على ESC
-                document.addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape') {
+                if (initialized) {
+                    await loadApplications();
+                    
+                    // تفعيل التحديث المباشر
+                    setupRealtimeUpdates();
+                    
+                    // إعداد أزرار التصفية والبحث
+                    document.getElementById('searchInput').addEventListener('input', filterApplications);
+                    document.getElementById('typeFilter').addEventListener('change', filterApplications);
+                    document.getElementById('statusFilter').addEventListener('change', filterApplications);
+                    
+                    document.getElementById('refreshBtn').addEventListener('click', async () => {
+                        document.getElementById('refreshBtn').disabled = true;
+                        await loadApplications();
+                        document.getElementById('refreshBtn').disabled = false;
+                        showNotification('تم تحديث البيانات بنجاح', 'success');
+                    });
+                    
+                    document.getElementById('liveUpdateToggle').addEventListener('click', toggleLiveUpdate);
+                    
+                    // إعداد أزرار المودال
+                    document.getElementById('closeViewModal').addEventListener('click', () => closeModal('viewModal'));
+                    document.getElementById('closeViewBtn').addEventListener('click', () => closeModal('viewModal'));
+                    document.getElementById('saveChangesBtn').addEventListener('click', saveChanges);
+                    document.getElementById('closeImageViewer').addEventListener('click', closeImageViewer);
+                    
+                    // إغلاق المودال عند النقر على الخلفية
+                    document.getElementById('modalOverlay').addEventListener('click', function() {
                         closeModal('viewModal');
                         closeImageViewer();
                         document.getElementById('officialReceipt').classList.remove('visible');
-                        document.getElementById('modalOverlay').style.opacity = '0';
+                        this.style.opacity = '0';
                         setTimeout(() => {
-                            document.getElementById('modalOverlay').style.display = 'none';
+                            this.style.display = 'none';
                         }, 300);
-                    }
-                });
-                
-                console.log('✅ لوحة التحكم مع التحديث المباشر جاهزة!');
-            } else {
-                showNotification('تعذر الاتصال بقاعدة البيانات', 'error');
+                    });
+                    
+                    // إغلاق المودال عند الضغط على ESC
+                    document.addEventListener('keydown', function(event) {
+                        if (event.key === 'Escape') {
+                            closeModal('viewModal');
+                            closeImageViewer();
+                            document.getElementById('officialReceipt').classList.remove('visible');
+                            document.getElementById('modalOverlay').style.opacity = '0';
+                            setTimeout(() => {
+                                document.getElementById('modalOverlay').style.display = 'none';
+                            }, 300);
+                        }
+                    });
+                    
+                    console.log('✅ لوحة التحكم مع التحديث المباشر جاهزة!');
+                    showNotification('لوحة التحكم جاهزة للاستخدام', 'success');
+                    
+                } else {
+                    showNotification('تعذر الاتصال بقاعدة البيانات. يرجى التحقق من الاتصال بالإنترنت.', 'error');
+                }
+            } catch (error) {
+                console.error('❌ خطأ في تهيئة الصفحة:', error);
+                showNotification('حدث خطأ في تهيئة لوحة التحكم', 'error');
             }
         }
         
