@@ -485,12 +485,17 @@
         
         tr.new-row {
             animation: highlightRow 2s ease-out;
-            background: linear-gradient(135deg, rgba(56, 161, 105, 0.1) 0%, rgba(56, 161, 105, 0.05) 100%) !important;
+            background: linear-gradient(135deg, rgba(56, 161, 105, 0.15) 0%, rgba(56, 161, 105, 0.08) 100%) !important;
+        }
+        
+        tr.new-row.unread {
+            background: linear-gradient(135deg, rgba(56, 161, 105, 0.25) 0%, rgba(56, 161, 105, 0.15) 100%) !important;
+            border-left: 4px solid var(--success);
         }
         
         @keyframes highlightRow {
             0% { background: rgba(56, 161, 105, 0.3); }
-            100% { background: rgba(56, 161, 105, 0.05); }
+            100% { background: rgba(56, 161, 105, 0.15); }
         }
         
         .status-badge {
@@ -1172,6 +1177,306 @@
             border-radius: 6px;
         }
         
+        /* ========== ✅ وصل الانتساب الرسمي من الكود الأول ========== */
+        .official-receipt {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 800px;
+            min-height: 1000px;
+            background: white;
+            padding: 20px;
+            text-align: right;
+            z-index: -1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
+            border: none;
+            overflow: hidden;
+            font-size: 14px;
+        }
+        
+        .official-receipt.visible {
+            transform: translate(-50%, -50%) scale(0.9);
+            opacity: 1;
+            visibility: visible;
+            z-index: 2000;
+        }
+        
+        .official-content {
+            padding: 30px;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        
+        .official-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #000;
+        }
+        
+        .official-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+        }
+        
+        .official-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .official-main-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 8px;
+        }
+        
+        .official-sub-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .official-body {
+            margin-bottom: 30px;
+        }
+        
+        .photo-and-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+        
+        .official-photo-container {
+            width: 180px;
+            height: 220px;
+            border: 2px solid #ccc;
+            position: relative;
+            background: #f9f9f9;
+            flex-shrink: 0;
+            margin-left: 20px;
+            margin-top: 0;
+        }
+        
+        .official-photo-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .official-photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .official-photo-placeholder i {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .official-details {
+            flex-grow: 1;
+            margin-right: 0;
+        }
+        
+        .official-info-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 6px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .official-info-label {
+            width: 160px;
+            font-weight: bold;
+            color: #000;
+            font-size: 14px;
+        }
+        
+        .official-info-value {
+            flex-grow: 1;
+            color: #333;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .empty-field {
+            color: #999;
+        }
+        
+        .declaration-section {
+            border: 2px solid #000;
+            padding: 20px;
+            margin: 25px 0;
+            background: #f8f8f8;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .declaration-title {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+            color: #2c5282;
+        }
+        
+        .declaration-text {
+            text-align: justify;
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        .signatures-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+        
+        .official-signature-box {
+            width: 250px;
+            text-align: center;
+        }
+        
+        .official-signature-line {
+            height: 2px;
+            background: #000;
+            margin: 40px 0 10px;
+        }
+        
+        .official-signature-label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .document-date {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        @media print {
+            .official-receipt {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                transform: none !important;
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 10mm !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+            
+            .official-content {
+                padding: 0 !important;
+            }
+            
+            .official-header {
+                margin-bottom: 20px !important;
+            }
+            
+            .official-main-title {
+                font-size: 20pt !important;
+            }
+            
+            .official-sub-title {
+                font-size: 16pt !important;
+            }
+            
+            .official-info-row {
+                font-size: 11pt !important;
+            }
+            
+            .declaration-text {
+                font-size: 10pt !important;
+            }
+        }
+        
+        @media (max-width: 850px) {
+            .official-receipt {
+                width: 95% !important;
+                min-height: auto !important;
+                padding: 15px !important;
+            }
+            
+            .official-content {
+                padding: 20px !important;
+            }
+            
+            .photo-and-details {
+                flex-direction: column !important;
+            }
+            
+            .official-photo-container {
+                width: 150px !important;
+                height: 180px !important;
+                margin: 0 auto 20px !important;
+            }
+            
+            .official-details {
+                margin-right: 0 !important;
+            }
+            
+            .official-info-label {
+                width: 140px !important;
+            }
+            
+            .signatures-section {
+                flex-direction: column !important;
+                gap: 30px !important;
+            }
+            
+            .official-signature-box {
+                width: 100% !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .official-receipt {
+                transform: translate(-50%, -50%) scale(0.8) !important;
+            }
+            
+            .official-main-title {
+                font-size: 20px !important;
+            }
+            
+            .official-sub-title {
+                font-size: 16px !important;
+            }
+            
+            .official-info-row {
+                flex-direction: column !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .official-info-label {
+                width: 100% !important;
+                margin-bottom: 2px !important;
+            }
+        }
+        
         /* Media Queries */
         @media (max-width: 768px) {
             .stats-cards {
@@ -1200,7 +1505,7 @@
             .view-photo-container {
                 min-height: 200px;
                 width: 100%;
-                max-width: 250px;
+                max-width: 180px;
                 margin: 0 auto;
             }
             
@@ -1623,6 +1928,106 @@
         </div>
     </div>
 
+    <!-- ========== ✅ وصل الانتساب الرسمي من الكود الأول ========== -->
+    <div class="official-receipt" id="officialReceipt">
+        <div class="official-content">
+            <div class="official-header">
+                <div class="official-logo">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNX9aZzQhhFn-2gj2MIS8D4mn-5iizM4hgXQ&s" alt="شعار اتحاد نقابات العمال">
+                </div>
+                <h1 class="official-main-title">اتحاد نقابات العمال في العراق</h1>
+                <h2 class="official-sub-title">اتحاد نقابات عمال ذي قار</h2>
+            </div>
+            
+            <div class="official-body">
+                <div class="photo-and-details">
+                    <div class="official-details">
+                        <div class="official-info-row">
+                            <div class="official-info-label">الاسم الرباعي:</div>
+                            <div class="official-info-value" id="officialFullName"></div>
+                        </div>
+                        
+                        <div class="official-info-row">
+                            <div class="official-info-label">اسم الزوج/ة:</div>
+                            <div class="official-info-value" id="officialSpouseName"></div>
+                        </div>
+                        
+                        <div class="official-info-row">
+                            <div class="official-info-label">محل الولادة:</div>
+                            <div class="official-info-value" id="officialBirthPlace"></div>
+                        </div>
+                        
+                        <div class="official-info-row">
+                            <div class="official-info-label">مكان السكن الحالي:</div>
+                            <div class="official-info-value" id="officialResidence"></div>
+                        </div>
+                        
+                        <div class="official-info-row">
+                            <div class="official-info-label">رقم الهاتف:</div>
+                            <div class="official-info-value" id="officialPhoneNumber"></div>
+                        </div>
+                        
+                        <div class="official-info-row">
+                            <div class="official-info-label">رقم الهوية:</div>
+                            <div class="official-info-value" class="empty-field">.................</div>
+                        </div>
+                        
+                        <div class="official-info-row">
+                            <div class="official-info-label">تاريخ الإصدار:</div>
+                            <div class="official-info-value" class="empty-field">.................</div>
+                        </div>
+                        
+                        <div class="official-info-row">
+                            <div class="official-info-label">رقم وصل القطع:</div>
+                            <div class="official-info-value" class="empty-field">.................</div>
+                        </div>
+                        
+                        <div class="official-info-row">
+                            <div class="official-info-label">النقابة:</div>
+                            <div class="official-info-value" id="officialUnion"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="official-photo-container">
+                        <div class="official-photo-placeholder" id="officialPhotoPlaceholder">
+                            <i class="fas fa-user-circle"></i>
+                            <div>الصورة الشخصية</div>
+                        </div>
+                        <img id="officialPhotoPreview" class="official-photo-preview" alt="الصورة الشخصية" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="declaration-section">
+                    <div class="declaration-title">تعهد</div>
+                    <div class="declaration-text">
+                        أنا العامل/ <span id="declarationName"></span> اتعهد امامكم بأني امارس عملي في القطاع الخاص والمختلط والتعاوني واعمل بصفة عامل وغير موظف عمومي في القطاع العام او عقد وزاري او منتسب وزارة الداخلية او الدفاع كما اتعهد بصحة كافة الاوراق والمستمسكات المقدمة الى اتحادكم من قبلي وبخلاف ذلك اتحمل كافة التبعات القانونية وارغب بالانتماء الى نقابة (<span id="declarationUnion">.................................</span>) ومستعد لدفع بدل الاشتراك الشهري والسنوي 1% من الاجر الذي اتقاضاه وحسب ما نص عليه قانون التنظيم النقابي رقم 52 لسنة 1987.
+                    </div>
+                </div>
+                
+                <div class="signatures-section">
+                    <div class="official-signature-box">
+                        <div class="official-signature-line"></div>
+                        <div class="official-signature-label">بصمة العامل</div>
+                    </div>
+                    
+                    <div class="official-signature-box">
+                        <div class="official-signature-line"></div>
+                        <div class="official-signature-label">مصادقة النقابة المختصة</div>
+                    </div>
+                    
+                    <div class="official-signature-box">
+                        <div class="official-signature-line"></div>
+                        <div class="official-signature-label">مصادقة الدائرة القانونية</div>
+                    </div>
+                </div>
+                
+                <div class="document-date">
+                    صدرت هذه الوثيقة بتاريخ: <span id="officialDocumentDate"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ========== تهيئة المتغيرات ==========
         let supabaseClient = null;
@@ -1636,6 +2041,7 @@
         let liveUpdateEnabled = true;
         let realtimeSubscription = null;
         let lastUpdateTimestamp = null;
+        let newApplicationsIds = new Set(); // لتتبع الطلبات الجديدة غير المقروءة
         
         // ========== تهيئة Supabase ==========
         async function initializeSupabase() {
@@ -1698,8 +2104,11 @@
                     const newItemsCount = newDataCount - oldDataCount;
                     showNotification(`تم إضافة ${newItemsCount} طلب جديد`, 'success');
                     
-                    // تسليط الضوء على الصف الجديد
-                    highlightNewRow();
+                    // إضافة الطلبات الجديدة إلى مجموعة غير المقروءة
+                    const newItems = applicationsData.slice(0, newItemsCount);
+                    newItems.forEach(item => {
+                        newApplicationsIds.add(item.id);
+                    });
                 }
                 
                 if (applicationsData.length === 0) {
@@ -1945,12 +2354,16 @@
                     typeText = 'تجديد';
                 }
                 
-                // عرض النقابة - استخدم union_name أو union
+                // عرض النقابة - استخدام union_name أولاً، ثم union، ثم الافتراضي
                 const unionText = app.union_name || app.union || 'لم يتم التحديد';
                 
-                // تحديد إذا كان الطلب جديد (آخر 5 دقائق)
-                const isNew = isApplicationNew(app.created_at);
-                if (isNew) {
+                // تحديد إذا كان الطلب جديد (غير مقروء)
+                const isUnread = newApplicationsIds.has(app.id);
+                
+                // إضافة كلاس للصف الجديد غير المقروء
+                if (isUnread) {
+                    row.classList.add('new-row', 'unread');
+                } else if (isApplicationNew(app.created_at)) {
                     row.classList.add('new-row');
                 }
                 
@@ -1978,21 +2391,23 @@
                     </td>
                 `;
                 
+                // إضافة حدث للنقر على الصف لإزالة التمييز
+                row.addEventListener('click', (e) => {
+                    if (!e.target.closest('.action-buttons')) {
+                        markAsRead(app.id);
+                    }
+                });
+                
                 tableBody.appendChild(row);
             });
         }
         
-        function highlightNewRow() {
-            const rows = document.querySelectorAll('#applicationsTableBody tr');
-            if (rows.length > 0) {
-                const firstRow = rows[0];
-                firstRow.classList.add('new-row');
-                
-                // إزالة التمييز بعد 3 ثواني
-                setTimeout(() => {
-                    firstRow.classList.remove('new-row');
-                }, 3000);
-            }
+        function markAsRead(appId) {
+            // إزالة الطلب من مجموعة غير المقروءة
+            newApplicationsIds.delete(appId);
+            
+            // إعادة عرض الجدول لتحديث الأنماط
+            renderApplicationsTable();
         }
         
         function isApplicationNew(createdAt) {
@@ -2055,6 +2470,9 @@
                 currentApplicationData = data;
                 prepareView(data);
                 
+                // إزالة التمييز عند فتح الطلب
+                markAsRead(id);
+                
                 showModal('viewModal');
                 
             } catch (error) {
@@ -2080,7 +2498,7 @@
             document.getElementById('viewStatusText').textContent = 
                 data.status === 'pending' ? 'قيد المعالجة' : 'مكتملة';
             
-            // عرض النقابة - استخدم union_name أو union
+            // عرض النقابة - استخدام union_name أولاً، ثم union، ثم الافتراضي
             const unionValue = data.union_name || data.union || 'لم يتم التحديد';
             document.getElementById('viewUnion').textContent = unionValue;
             
@@ -2250,10 +2668,8 @@
             }
             
             try {
-                // تحويل اسم الحقل إذا كان union_name إلى union
-                const dbFieldName = fieldName === 'union_name' ? 'union' : fieldName;
-                
-                const updateData = { [dbFieldName]: newValue };
+                // تحديث قاعدة البيانات
+                const updateData = { [fieldName]: newValue };
                 const { error } = await supabaseClient
                     .from('membership_applications')
                     .update(updateData)
@@ -2273,25 +2689,7 @@
                 
             } catch (error) {
                 console.error('❌ خطأ في حفظ التعديل:', error);
-                
-                // محاولة أخرى باستخدام حقل مختلف
-                if (error.message.includes('union_name')) {
-                    try {
-                        const updateData = { union: newValue };
-                        const { error: secondError } = await supabaseClient
-                            .from('membership_applications')
-                            .update(updateData)
-                            .eq('id', currentApplicationId);
-                        
-                        if (secondError) throw secondError;
-                        
-                        showNotification('تم حفظ التغيير بنجاح', 'success');
-                    } catch (secondError) {
-                        showNotification('حدث خطأ في حفظ التغيير', 'error');
-                    }
-                } else {
-                    showNotification('حدث خطأ في حفظ التغيير', 'error');
-                }
+                showNotification('حدث خطأ في حفظ التغيير', 'error');
             }
         }
         
@@ -2302,6 +2700,252 @@
                 element.classList.add('editable');
                 element.setAttribute('onclick', `editField('${fieldName}', this)`);
             }
+        }
+        
+        // ========== ✅ دالة طباعة الوصل الرسمي من الكود الأول ==========
+        function printOfficialReceipt() {
+            if (!currentApplicationData) return;
+            
+            const data = currentApplicationData;
+            
+            // تحديث المعلومات في وصل الانتساب الرسمي
+            document.getElementById('officialFullName').textContent = data.full_name || 'غير متوفر';
+            document.getElementById('officialSpouseName').textContent = data.spouse_name || 'غير متوفر';
+            document.getElementById('officialBirthPlace').textContent = data.birth_place || 'غير متوفر';
+            document.getElementById('officialResidence').textContent = data.residence || 'غير متوفر';
+            document.getElementById('officialPhoneNumber').textContent = data.phone_number || 'غير متوفر';
+            document.getElementById('declarationName').textContent = data.full_name || 'المتقدم';
+            
+            // إضافة اسم النقابة المختارة
+            const unionToDisplay = selectedUnion || data.union_name || data.union || 'لم يتم التحديد';
+            document.getElementById('officialUnion').textContent = unionToDisplay;
+            
+            // تحديث التعهد ليشمل اسم النقابة
+            document.getElementById('declarationUnion').textContent = unionToDisplay;
+            
+            // تاريخ اليوم
+            const today = new Date();
+            const todayFormatted = today.toLocaleDateString('ar-EG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('officialDocumentDate').textContent = todayFormatted;
+            
+            // عرض الصورة الشخصية
+            if (data.has_personal_photo && data.personal_photo_base64) {
+                document.getElementById('officialPhotoPreview').src = data.personal_photo_base64;
+                document.getElementById('officialPhotoPreview').style.display = 'block';
+                document.getElementById('officialPhotoPlaceholder').style.display = 'none';
+            } else {
+                document.getElementById('officialPhotoPreview').style.display = 'none';
+                document.getElementById('officialPhotoPlaceholder').style.display = 'flex';
+            }
+            
+            // إظهار الوصل الرسمي
+            document.getElementById('officialReceipt').classList.add('visible');
+            document.getElementById('modalOverlay').style.display = 'block';
+            document.getElementById('modalOverlay').style.opacity = '1';
+            
+            // إضافة مؤشر تحميل
+            const printBtn = document.getElementById('printOfficialReceiptBtn');
+            const originalText = printBtn.innerHTML;
+            printBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
+            printBtn.disabled = true;
+            
+            // الانتظار قليلاً ثم التقاط الصورة
+            setTimeout(() => {
+                captureReceiptAsImage('officialReceipt', `وصل_انتساب_رسمي_${data.receipt_id || data.id}.png`);
+            }, 500);
+        }
+        
+        // ========== ✅ دالة طباعة الوصل من الجدول ==========
+        async function printReceiptFromTable(id) {
+            if (isProcessing) return;
+            
+            try {
+                isProcessing = true;
+                
+                // البحث عن البيانات في الذاكرة أولاً
+                let data = applicationsData.find(app => app.id === id);
+                
+                // إذا لم توجد في الذاكرة، جلبها من قاعدة البيانات
+                if (!data) {
+                    const result = await supabaseClient
+                        .from('membership_applications')
+                        .select('*')
+                        .eq('id', id)
+                        .single();
+                    
+                    if (result.error) throw result.error;
+                    data = result.data;
+                }
+                
+                // حفظ البيانات للاستخدام
+                currentApplicationData = data;
+                currentApplicationId = id;
+                
+                // طباعة الوصل الرسمي
+                printOfficialReceipt();
+                
+            } catch (error) {
+                console.error('❌ خطأ في طباعة الوصل:', error);
+                showNotification('حدث خطأ في طباعة الوصل', 'error');
+            } finally {
+                isProcessing = false;
+            }
+        }
+        
+        // ========== ✅ دالة التقاط الوصل كصورة وتحميلها تلقائياً ==========
+        function captureReceiptAsImage(elementId, fileName) {
+            const receiptElement = document.getElementById(elementId);
+            const isOfficial = elementId === 'officialReceipt';
+            
+            const options = {
+                scale: isOfficial ? 1.2 : 1.5,
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                logging: false,
+                allowTaint: true,
+                scrollX: 0,
+                scrollY: 0,
+                width: receiptElement.offsetWidth,
+                height: receiptElement.offsetHeight,
+                x: 0,
+                y: 0,
+                imageTimeout: 15000,
+                onclone: function(clonedDoc) {
+                    const clonedElement = clonedDoc.getElementById(elementId);
+                    
+                    if (isOfficial) {
+                        clonedElement.style.width = '800px';
+                        clonedElement.style.height = 'auto';
+                        clonedElement.style.position = 'absolute';
+                        clonedElement.style.left = '0';
+                        clonedElement.style.top = '0';
+                        clonedElement.style.transform = 'none';
+                        
+                        const allTextElements = clonedElement.querySelectorAll('*');
+                        allTextElements.forEach(el => {
+                            if (el.tagName !== 'IMG') {
+                                el.style.color = '#000000';
+                                el.style.fontWeight = 'bold';
+                                el.style.textShadow = 'none';
+                                el.style.fontSize = '14px';
+                            }
+                        });
+                        
+                        const titles = clonedElement.querySelectorAll('h1, h2, h3');
+                        titles.forEach(title => {
+                            title.style.fontSize = title.style.fontSize || '20px';
+                            title.style.color = '#000000';
+                            title.style.fontWeight = '900';
+                        });
+                    } else {
+                        clonedElement.style.transform = 'none';
+                        clonedElement.style.position = 'absolute';
+                        clonedElement.style.left = '0';
+                        clonedElement.style.top = '0';
+                    }
+                }
+            };
+            
+            html2canvas(receiptElement, options).then(canvas => {
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                
+                const highQualityCanvas = document.createElement('canvas');
+                highQualityCanvas.width = canvas.width;
+                highQualityCanvas.height = canvas.height;
+                const hqCtx = highQualityCanvas.getContext('2d');
+                
+                hqCtx.fillStyle = '#ffffff';
+                hqCtx.fillRect(0, 0, highQualityCanvas.width, highQualityCanvas.height);
+                
+                hqCtx.drawImage(canvas, 0, 0);
+                
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = highQualityCanvas.toDataURL('image/png', 1.0);
+                
+                // إغلاق الوصل بعد التنزيل
+                document.getElementById('officialReceipt').classList.remove('visible');
+                document.getElementById('modalOverlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('modalOverlay').style.display = 'none';
+                }, 300);
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // إعادة تعيين زر الطباعة
+                const printBtn = document.getElementById('printOfficialReceiptBtn');
+                if (printBtn) {
+                    printBtn.innerHTML = '<i class="fas fa-file-contract"></i> طباعة الوصل الرسمي';
+                    printBtn.disabled = false;
+                }
+                
+                setTimeout(() => {
+                    alert(`تم تنزيل ${fileName} بنجاح!\nتم حفظ الملف في مجلد التنزيلات.\nالجودة: عالية - الوضوح: ممتاز`);
+                }, 500);
+                
+            }).catch(error => {
+                console.error('خطأ في إنشاء الصورة:', error);
+                
+                try {
+                    html2canvas(receiptElement, {
+                        scale: 1,
+                        backgroundColor: '#ffffff',
+                        useCORS: true
+                    }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = fileName;
+                        link.href = canvas.toDataURL('image/png');
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        // إعادة تعيين زر الطباعة
+                        const printBtn = document.getElementById('printOfficialReceiptBtn');
+                        if (printBtn) {
+                            printBtn.innerHTML = '<i class="fas fa-file-contract"></i> طباعة الوصل الرسمي';
+                            printBtn.disabled = false;
+                        }
+                        
+                        document.getElementById('officialReceipt').classList.remove('visible');
+                        document.getElementById('modalOverlay').style.opacity = '0';
+                        setTimeout(() => {
+                            document.getElementById('modalOverlay').style.display = 'none';
+                        }, 300);
+                        
+                        alert(`تم تنزيل ${fileName} بنجاح!\n(بجودة منخفضة بسبب مشكلة تقنية)`);
+                    });
+                } catch (secondError) {
+                    // إعادة تعيين زر الطباعة
+                    const printBtn = document.getElementById('printOfficialReceiptBtn');
+                    if (printBtn) {
+                        printBtn.innerHTML = '<i class="fas fa-file-contract"></i> طباعة الوصل الرسمي';
+                        printBtn.disabled = false;
+                    }
+                    
+                    document.getElementById('officialReceipt').classList.remove('visible');
+                    document.getElementById('modalOverlay').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('modalOverlay').style.display = 'none';
+                    }, 300);
+                    
+                    alert('حدث خطأ أثناء إنشاء الوصل. يرجى المحاولة مرة أخرى.');
+                }
+            });
+        }
+        
+        // ========== ✅ طباعة الوصل من نافذة العرض ==========
+        function printOfficialReceiptFromViewModal() {
+            if (!currentApplicationData) return;
+            
+            printOfficialReceipt();
         }
         
         // ========== حفظ جميع التغييرات ==========
@@ -2338,21 +2982,22 @@
                 if (error) {
                     console.error('❌ خطأ في حفظ التغييرات:', error);
                     
-                    // محاولة بدون union_name
-                    delete updatedData.union_name;
-                    const { data: retryData, error: retryError } = await supabaseClient
-                        .from('membership_applications')
-                        .update(updatedData)
-                        .eq('id', currentApplicationId)
-                        .select();
-                    
-                    if (retryError) throw retryError;
-                    
-                    showNotification('تم حفظ التغييرات بنجاح!', 'success');
-                } else {
-                    showNotification('تم حفظ جميع التغييرات بنجاح!', 'success');
+                    // محاولة باستخدام union فقط
+                    if (updatedData.union_name) {
+                        delete updatedData.union_name;
+                        const { data: retryData, error: retryError } = await supabaseClient
+                            .from('membership_applications')
+                            .update(updatedData)
+                            .eq('id', currentApplicationId)
+                            .select();
+                        
+                        if (retryError) throw retryError;
+                    } else {
+                        throw error;
+                    }
                 }
                 
+                showNotification('تم حفظ جميع التغييرات بنجاح!', 'success');
                 closeModal('viewModal');
                 loadApplications(true);
                 
@@ -2362,210 +3007,6 @@
             } finally {
                 isProcessing = false;
             }
-        }
-        
-        // ========== طباعة الوصل من الجدول ==========
-        async function printReceiptFromTable(id) {
-            if (isProcessing) return;
-            
-            try {
-                isProcessing = true;
-                
-                // البحث عن البيانات في الذاكرة أولاً
-                let data = applicationsData.find(app => app.id === id);
-                
-                // إذا لم توجد في الذاكرة، جلبها من قاعدة البيانات
-                if (!data) {
-                    const result = await supabaseClient
-                        .from('membership_applications')
-                        .select('*')
-                        .eq('id', id)
-                        .single();
-                    
-                    if (result.error) throw result.error;
-                    data = result.data;
-                }
-                
-                // إنشاء محتوى الوصل
-                const receiptContent = createReceiptContent(data);
-                
-                // فتح نافذة جديدة للطباعة
-                const printWindow = window.open('', '_blank');
-                printWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html dir="rtl" lang="ar">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>وصل انتساب - ${data.receipt_id || data.id}</title>
-                        <style>
-                            body {
-                                font-family: 'Cairo', sans-serif;
-                                line-height: 1.6;
-                                color: #000;
-                                padding: 20px;
-                                max-width: 800px;
-                                margin: 0 auto;
-                            }
-                            .receipt-header {
-                                text-align: center;
-                                margin-bottom: 30px;
-                                border-bottom: 3px solid #000;
-                                padding-bottom: 20px;
-                            }
-                            .receipt-title {
-                                font-size: 24px;
-                                font-weight: bold;
-                                color: #000;
-                                margin-bottom: 10px;
-                            }
-                            .receipt-subtitle {
-                                font-size: 18px;
-                                color: #333;
-                                margin-bottom: 15px;
-                            }
-                            .receipt-logo {
-                                width: 100px;
-                                height: 100px;
-                                margin: 0 auto 15px;
-                            }
-                            .receipt-logo img {
-                                width: 100%;
-                                height: 100%;
-                                object-fit: contain;
-                            }
-                            .receipt-body {
-                                margin-bottom: 30px;
-                            }
-                            .info-row {
-                                display: flex;
-                                justify-content: space-between;
-                                margin-bottom: 10px;
-                                padding: 8px 0;
-                                border-bottom: 1px solid #ddd;
-                            }
-                            .info-label {
-                                font-weight: bold;
-                                color: #000;
-                                min-width: 150px;
-                            }
-                            .info-value {
-                                color: #333;
-                                text-align: left;
-                                flex-grow: 1;
-                            }
-                            .receipt-footer {
-                                text-align: center;
-                                margin-top: 40px;
-                                padding-top: 20px;
-                                border-top: 2px solid #000;
-                            }
-                            @media print {
-                                body {
-                                    padding: 0;
-                                }
-                                .receipt-header {
-                                    page-break-after: avoid;
-                                }
-                                .receipt-body {
-                                    page-break-inside: avoid;
-                                }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${receiptContent}
-                        <script>
-                            window.onload = function() {
-                                window.print();
-                                setTimeout(function() {
-                                    window.close();
-                                }, 1000);
-                            }
-                        <\/script>
-                    </body>
-                    </html>
-                `);
-                printWindow.document.close();
-                
-                showNotification('جارٍ فتح نافذة الطباعة...', 'info');
-                
-            } catch (error) {
-                console.error('❌ خطأ في طباعة الوصل:', error);
-                showNotification('حدث خطأ في طباعة الوصل', 'error');
-            } finally {
-                isProcessing = false;
-            }
-        }
-        
-        function createReceiptContent(data) {
-            const unionValue = data.union_name || data.union || 'لم يتم التحديد';
-            
-            return `
-                <div class="receipt-header">
-                    <div class="receipt-logo">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNX9aZzQhhFn-2gj2MIS8D4mn-5iizM4hgXQ&s" alt="شعار اتحاد نقابات العمال">
-                    </div>
-                    <h1 class="receipt-title">اتحاد نقابات العمال في العراق</h1>
-                    <h2 class="receipt-subtitle">اتحاد نقابات عمال ذي قار</h2>
-                    <h3>وصل انتساب رسمي</h3>
-                </div>
-                
-                <div class="receipt-body">
-                    <div class="info-row">
-                        <span class="info-label">رقم الطلب:</span>
-                        <span class="info-value">${data.receipt_id || 'غير متوفر'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">الاسم الرباعي:</span>
-                        <span class="info-value">${data.full_name || 'غير متوفر'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">رقم الهاتف:</span>
-                        <span class="info-value">${data.phone_number || 'غير متوفر'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">محل الولادة:</span>
-                        <span class="info-value">${data.birth_place || 'غير متوفر'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">مكان السكن:</span>
-                        <span class="info-value">${data.residence || 'غير متوفر'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">نوع الطلب:</span>
-                        <span class="info-value">${data.application_type === 'new' ? 'إصدار هوية لأول مرة' : 'تجديد الهوية'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">النقابة:</span>
-                        <span class="info-value">${unionValue}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">الحالة:</span>
-                        <span class="info-value">${data.status === 'pending' ? 'قيد المعالجة' : 'مكتملة'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">تاريخ الإرسال:</span>
-                        <span class="info-value">${new Date(data.created_at).toLocaleDateString('ar-EG', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })}</span>
-                    </div>
-                </div>
-                
-                <div class="receipt-footer">
-                    <p>© 2026 اتحاد نقابات العمال في العراق - اتحاد نقابات عمال ذي قار</p>
-                    <p>هذا الوصل للاستعراض السريع فقط</p>
-                </div>
-            `;
-        }
-        
-        // ========== طباعة الوصل من نافذة العرض ==========
-        function printOfficialReceiptFromViewModal() {
-            if (!currentApplicationData) return;
-            
-            printReceiptFromTable(currentApplicationId);
         }
         
         // ========== حذف الطلب ==========
@@ -2584,6 +3025,9 @@
                     .eq('id', id);
                 
                 if (error) throw error;
+                
+                // إزالة من مجموعة غير المقروءة
+                newApplicationsIds.delete(id);
                 
                 showNotification('تم حذف الطلب بنجاح!', 'success');
                 loadApplications(true);
@@ -2696,6 +3140,11 @@
                 document.getElementById('modalOverlay').addEventListener('click', function() {
                     closeModal('viewModal');
                     closeImageViewer();
+                    document.getElementById('officialReceipt').classList.remove('visible');
+                    this.style.opacity = '0';
+                    setTimeout(() => {
+                        this.style.display = 'none';
+                    }, 300);
                 });
                 
                 // إغلاق المودال عند الضغط على ESC
@@ -2703,6 +3152,11 @@
                     if (event.key === 'Escape') {
                         closeModal('viewModal');
                         closeImageViewer();
+                        document.getElementById('officialReceipt').classList.remove('visible');
+                        document.getElementById('modalOverlay').style.opacity = '0';
+                        setTimeout(() => {
+                            document.getElementById('modalOverlay').style.display = 'none';
+                        }, 300);
                     }
                 });
                 
